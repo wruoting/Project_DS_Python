@@ -7,6 +7,7 @@ from scipy import linalg
 import matplotlib.pyplot as plt
 from sklearn.neighbors import KNeighborsClassifier
 import os
+from collections import deque
 
 def convert_pca(data, dimx=28, dimy=28, n=1):
     data = np.array(data).reshape(dimx, dimy)
@@ -25,6 +26,9 @@ def main():
     mndata = MNIST(data_path)
     images_training, labels_training = mndata.load_training()
     images_testing, labels_testing = mndata.load_testing()
+    images_testing = np.asarray(images_testing)
+    labels_training = np.asarray(labels_training)
+    labels_testing = np.asarray(labels_testing)
 
     # PCA
     standardized_training = './Standardized_training.csv'
@@ -49,13 +53,28 @@ def main():
             images_training_standardized_pca = np.array([convert_pca(image, n=10)[0].flatten() for image in images_training_standardized])
             pd.DataFrame(images_training_standardized_pca).to_csv(standardized_training_pca, index=False)
     
-    # print(images_training_standardized_pca)
+    pca_accuracy_list = deque()
+    accuracy_list = deque()
 
-    # for n in range(1, 25):
-    #     knn_classifier = KNeighborsClassifier(n_neighbors=n)
-    
-    
+    for n in range(1, 25):
+        print('Starting classification')
+        knn_classifier = KNeighborsClassifier(n_neighbors=n, n_jobs=-1)
+        knn_classifier.fit(images_training_standardized[0:400], labels_training[0:400])
+        prediction_custom = knn_classifier.predict(images_testing)
+        accuracy = np.round(np.multiply(np.mean(labels_testing == prediction_custom), 100))
+        accuracy_list.append(accuracy)
 
+        knn_classifier_pca = KNeighborsClassifier(n_neighbors=n, n_jobs=-1)
+        knn_classifier_pca.fit(images_training_standardized_pca[0:400], labels_training[0:400])
+        prediction_custom_pca = knn_classifier_pca.predict(images_testing)
+        accuracy_pca = np.round(np.multiply(np.mean(labels_testing == prediction_custom_pca), 100))
+        pca_accuracy_list.append(accuracy_pca)
+    accuracies_df = pd.DataFrame(
+                {
+                    'N': range(1,25),
+                    'Accuracy': list(accuracy_list),
+                    'PCA Accuracy': list(pca_accuracy_list)
+                }, columns=['N', 'Accuracy', 'PCA Accuracy']).to_csv('Accuracies.csv', index=False)
 
 
 if __name__ == "__main__":
