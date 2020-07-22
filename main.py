@@ -22,10 +22,10 @@ def convert_pca(data, dimx=28, dimy=28, n=1):
     return x_hat, D
 
 
-def create_training_and_testing_data(images_training, labels_training, images_testing, labels_testing, name="", n=10):
+def create_training_and_testing_data(images_training, labels_training, images_testing, labels_testing, n=10):
      # PCA
-    standardized_training_pca = './PCA_training_{}.csv'.format(name)
-    standardized_testing_pca = './PCA_testing_{}.csv'.format(name)
+    standardized_training_pca = './PCA_training.csv'
+    standardized_testing_pca = './PCA_testing.csv'
 
     # Training PCA
     if os.path.exists(standardized_training_pca):
@@ -58,31 +58,40 @@ def main():
     labels_training = np.asarray(labels_training)
     labels_testing = np.asarray(labels_testing)
 
-    images_training_pca, images_testing_pca = create_training_and_testing_data(images_training, labels_training, images_testing, labels_testing, name="Random_Forest")
+    images_training_pca, images_testing_pca = create_training_and_testing_data(images_training, labels_training, images_testing, labels_testing)
     total_range = range(5, 6)
     pca_accuracy_list = deque()
     accuracy_list = deque()
     print('Starting classification')
-    # for n in total_range:    
-        # knn_classifier = KNeighborsClassifier(n_neighbors=n, n_jobs=-1)
-        # knn_classifier.fit(images_training_standardized[0:4000], labels_training[0:4000])
-        # prediction_custom = knn_classifier.predict(images_testing)
-        # accuracy = np.round(np.multiply(np.mean(labels_testing == prediction_custom), 100))
-        # accuracy_list.append(accuracy)
+    # KNN
+    knn_score = deque()
+    knn_pca_score = deque()
+    for n in range(1, 10):
+        print('Iteration {} of KNN'.format(n))
+        knn = KNeighborsClassifier()
+        knn = knn.fit(images_training, labels_training)
+        knn_score.append(knn.score(images_testing, labels_testing))
 
-        # knn_classifier_pca = KNeighborsClassifier(n_neighbors=n, n_jobs=-1)
-        # knn_classifier_pca.fit(images_training_standardized_pca[0:4000], labels_training[0:4000])
-        # prediction_custom_pca = knn_classifier_pca.predict(images_testing)
-        # accuracy_pca = np.round(np.multiply(np.mean(labels_testing == prediction_custom_pca), 100))
-        # pca_accuracy_list.append(accuracy_pca)
+        knn_pca = KNeighborsClassifier()
+        knn_pca = knn_pca.fit(images_training_pca, labels_training)
+        knn_pca_score.append(knn_pca.score(images_testing_pca, labels_testing))
+    knn_score = np.array(knn_score)
+    knn_pca_score = np.array(knn_pca_score)
+    accuracies_df = pd.DataFrame(
+            {
+                'Scores': knn_score,
+                'PCA_Scores': knn_pca_score
+            }).to_csv('KNNAccuracies.csv', index=False)
+
+
 
     # Random Forest Accuracies
     clf_score = deque()
     clf_pca_score = deque()
     for n in range(1, 10):
+        print('Iteration {} of Random Forest Classifier'.format(n))
         clf = RandomForestClassifier(n_estimators=100)
         clf = clf.fit(images_training, labels_training)
-        prediction_custom = clf.predict(images_testing)
         clf_score.append(clf.score(images_testing, labels_testing))
 
         clf_pca = RandomForestClassifier(n_estimators=100)
@@ -100,9 +109,9 @@ def main():
     dtc_score = deque()
     dtc_pca_score = deque()
     for n in range(1, 10):
+        print('Iteration {} of Decision Tree Accuracies'.format(n))
         dtc = tree.DecisionTreeClassifier()
         dtc = dtc.fit(images_training, labels_training)
-        prediction_custom = dtc.predict(images_testing)
         dtc_score.append(dtc.score(images_testing, labels_testing))
 
         dtc_pca = tree.DecisionTreeClassifier()
