@@ -62,11 +62,10 @@ def main():
     images_training_noise = create_noise(images_training)
 
     images_training_noise = np.array(images_training_noise)
-    print(images_training_noise.shape)
     x_hat, D = convert_pca(images_training_noise[1])
     data = np.array(images_training_noise[1]).reshape(28, 28)
     plot_demo(data, x_hat, fname='Noise_Comparison')
-    plot_scree(D, name='Scree_Plot_Noise')
+    plot_scree(D, n=15, name='Scree_Plot_Noise')
 
 if __name__ == "__main__":
     main()

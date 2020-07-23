@@ -38,12 +38,11 @@ def main():
     images_training_noise = create_noise(images_training)
     images_testing_noise = create_noise(images_testing)
 
-    images_training_pca_noise, images_testing_pca_noise = create_training_and_testing_data(images_training_noise, labels_training, images_testing_noise, labels_testing)
+    images_training_pca_noise, images_testing_pca_noise = create_training_and_testing_data(images_training_noise, labels_training, images_testing_noise, labels_testing, n=15)
 
     pca_accuracy_list = deque()
     accuracy_list = deque()
     print('Starting classification')
-
 
     clf = RandomForestClassifier(n_estimators=100)
     clf = clf.fit(images_training_noise, labels_training)
