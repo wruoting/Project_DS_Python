@@ -44,14 +44,6 @@ def main():
     accuracy_list = deque()
     print('Starting classification')
 
-    clf = RandomForestClassifier(n_estimators=100)
-    clf = clf.fit(images_training_noise, labels_training)
-    print(clf.score(images_testing_noise, labels_testing))
-
-    clf_pca = RandomForestClassifier(n_estimators=100)
-    clf_pca = clf_pca.fit(images_training_pca_noise, labels_training)
-    print(clf_pca.score(images_testing_pca_noise, labels_testing))
-
     # KNN
     print('Starting KNN')
     knn_score = deque()
