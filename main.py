@@ -1,4 +1,3 @@
-
 from mnist.loader import MNIST
 import numpy as np
 import pandas as pd
@@ -66,15 +65,13 @@ def main():
     # KNN
     knn_score = deque()
     knn_pca_score = deque()
-    for n in range(1, 10):
-        print('Iteration {} of KNN'.format(n))
-        knn = KNeighborsClassifier()
-        knn = knn.fit(images_training, labels_training)
-        knn_score.append(knn.score(images_testing, labels_testing))
+    knn = KNeighborsClassifier()
+    knn = knn.fit(images_training, labels_training)
+    knn_score.append(knn.score(images_testing, labels_testing))
 
-        knn_pca = KNeighborsClassifier()
-        knn_pca = knn_pca.fit(images_training_pca, labels_training)
-        knn_pca_score.append(knn_pca.score(images_testing_pca, labels_testing))
+    knn_pca = KNeighborsClassifier()
+    knn_pca = knn_pca.fit(images_training_pca, labels_training)
+    knn_pca_score.append(knn_pca.score(images_testing_pca, labels_testing))
     knn_score = np.array(knn_score)
     knn_pca_score = np.array(knn_pca_score)
     accuracies_df = pd.DataFrame(
@@ -82,7 +79,6 @@ def main():
                 'Scores': knn_score,
                 'PCA_Scores': knn_pca_score
             }).to_csv('KNNAccuracies.csv', index=False)
-
 
 
     # Random Forest Accuracies
