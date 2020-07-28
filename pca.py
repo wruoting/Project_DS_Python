@@ -5,6 +5,7 @@ from scipy import linalg
 import matplotlib.pyplot as plt
 from collections import deque
 from noise import create_noise
+from sklearn import preprocessing
 
 def convert_pca(data, dimx=28, dimy=28, n=10):
     data = np.array(data).reshape(dimx, dimy)
@@ -46,13 +47,14 @@ def main():
 
     images_training = np.asarray(images_training)
     images_testing = np.asarray(images_testing)
+    # Normalize data
+    images_training_normalize = preprocessing.normalize(images_training)
     labels_training = np.asarray(labels_training)
-    labels_testing = np.asarray(labels_testing)
 
     # # This converts and plots the pca of a c
-    x_hat, D = convert_pca(images_training[1])
+    x_hat, D = convert_pca(images_training_normalize[1])
 
-    data = np.array(images_training[1]).reshape(28, 28)
+    data = np.array(images_training_normalize[1]).reshape(28, 28)
     plot_demo(data, x_hat)
 
     # We can plot our scree plot to determine what percentage of our variance is attributed to those features
@@ -60,8 +62,9 @@ def main():
 
     # Adding noise
     images_training_noise = create_noise(images_training)
-
     images_training_noise = np.array(images_training_noise)
+    images_training_noise = preprocessing.normalize(images_training_noise)
+
     x_hat, D = convert_pca(images_training_noise[1])
     data = np.array(images_training_noise[1]).reshape(28, 28)
     plot_demo(data, x_hat, fname='Noise_Comparison')

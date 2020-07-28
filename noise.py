@@ -10,6 +10,7 @@ from collections import deque
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import tree
 from main import convert_pca, create_training_and_testing_data
+from sklearn import preprocessing
 
 def create_noise(image_data):
     image_data_noise = deque()
@@ -32,11 +33,15 @@ def main():
 
     images_training = np.asarray(images_training)
     images_testing = np.asarray(images_testing)
-    labels_training = np.asarray(labels_training)
-    labels_testing = np.asarray(labels_testing)
-
     images_training_noise = create_noise(images_training)
     images_testing_noise = create_noise(images_testing)
+    labels_training = np.asarray(labels_training)
+    labels_testing = np.asarray(labels_testing)
+    # Normalize data
+    images_training = preprocessing.normalize(images_training)
+    images_testing = preprocessing.normalize(images_testing)
+    images_training_noise = preprocessing.normalize(images_training_noise)
+    images_testing_noise = preprocessing.normalize(images_testing_noise)
 
     images_training_pca_noise, images_testing_pca_noise = create_training_and_testing_data(images_training_noise, labels_training, images_testing_noise, labels_testing, n=15)
 

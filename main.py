@@ -9,6 +9,7 @@ import os
 from collections import deque
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import tree
+from sklearn import preprocessing
 
 def convert_pca(data, dimx=28, dimy=28, n=1):
     data = np.array(data).reshape(dimx, dimy)
@@ -54,6 +55,9 @@ def main():
 
     images_training = np.asarray(images_training)
     images_testing = np.asarray(images_testing)
+    # Normalize data
+    images_training = preprocessing.normalize(images_training)
+    images_testing = preprocessing.normalize(images_testing)
     labels_training = np.asarray(labels_training)
     labels_testing = np.asarray(labels_testing)
 
